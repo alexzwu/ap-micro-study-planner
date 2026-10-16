@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<title>AP Microeconomics Study Planner</title>
+<style>
+  :root{
+    --bg:#f6f8fc; --card:#ffffff; --ink:#16213a; --muted:#68738a;
+    --accent:#1d4ed8; --accent-soft:#e3ecff; --good:#15803d; --good-soft:#e2f4e8;
+    --warn:#b45309; --warn-soft:#fdf0dc; --line:#e4e9f2; --radius:14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45; padding-bottom:64px;}
+  .wrap{max-width:760px; margin:0 auto; padding:16px 14px 0;}
+  header.hero{background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:#fff; border-radius:18px;
+    padding:22px 20px 18px; margin-bottom:14px; box-shadow:0 6px 18px rgba(29,78,216,.25);}
+  header.hero h1{margin:0 0 2px; font-size:21px; letter-spacing:.2px;}
+  header.hero .sub{opacity:.85; font-size:13.5px;}
+  .countdown{display:flex; gap:14px; margin-top:14px; align-items:baseline;}
+  .countdown .big{font-size:44px; font-weight:800; line-height:1;}
+  .countdown .lbl{font-size:13px; opacity:.85;}
+  .progress{margin-top:14px;}
+  .progress .bar{height:10px; background:rgba(255,255,255,.28); border-radius:99px; overflow:hidden;}
+  .progress .fill{height:100%; background:#fff; border-radius:99px; width:0%; transition:width .4s;}
+  .progress .txt{font-size:12.5px; opacity:.9; margin-top:6px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px; margin-bottom:12px;}
+  .card h2{margin:0 0 10px; font-size:16px;}
+  .card h3{margin:0 0 6px; font-size:15px;}
+  .muted{color:var(--muted); font-size:13px;}
+  .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .btn{display:inline-block; border:1px solid var(--accent); background:var(--accent); color:#fff;
+    border-radius:10px; padding:8px 13px; font-size:14px; text-decoration:none; cursor:pointer;}
+  .btn.ghost{background:#fff; color:var(--accent);}
+  .btn.small{padding:6px 10px; font-size:13px;}
+  .btn:disabled{opacity:.5;}
+  select.status{border:1px solid var(--line); border-radius:9px; padding:7px 9px; font-size:14px; background:#fff;}
+  .unit{border-left:5px solid #cbd5e1;}
+  .unit.st-studying{border-left-color:var(--accent);}
+  .unit.st-review{border-left-color:var(--warn);}
+  .unit.st-done{border-left-color:var(--good); background:linear-gradient(0deg,var(--good-soft),#fff 70%);}
+  .unit-top{display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap;}
+  .unit-num{font-size:12px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.6px;}
+  .unit-name{font-size:16.5px; font-weight:700; margin:2px 0 4px;}
+  .weight{display:inline-block; background:var(--accent-soft); color:var(--accent); font-size:12px;
+    font-weight:700; border-radius:99px; padding:2px 10px;}
+  .due{display:inline-block; background:var(--warn-soft); color:var(--warn); font-size:12px;
+    font-weight:700; border-radius:99px; padding:2px 10px; margin-left:6px;}
+  .check{display:flex; align-items:center; gap:9px; padding:7px 0; font-size:14px;}
+  .check input{width:19px; height:19px; accent-color:var(--accent);}
+  .check.done span{color:var(--muted); text-decoration:line-through;}
+  .rev-item{display:flex; align-items:center; gap:9px; padding:6px 0; font-size:14px;}
+  .rev-item input{width:19px; height:19px; accent-color:var(--warn);}
+  .rev-item .d{font-weight:600;}
+  .rev-item.overdue .d{color:#b91c1c;}
+  .quizlog{font-size:13px; color:var(--muted); margin-top:6px;}
+  .quizlog b{color:var(--ink);}
+  .scoreform{display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;}
+  .scoreform input{border:1px solid var(--line); border-radius:9px; padding:7px 9px; font-size:14px; width:110px;}
+  .tl-block{display:flex; gap:12px; padding:10px 0; border-top:1px solid var(--line); align-items:flex-start;}
+  .tl-block:first-of-type{border-top:none;}
+  .tl-block input[type=checkbox]{width:20px; height:20px; margin-top:2px; accent-color:var(--good); flex:none;}
+  .tl-dates{font-size:12.5px; color:var(--muted); white-space:nowrap;}
+  .tl-label{font-size:14.5px;}
+  .tl-label.done{color:var(--muted); text-decoration:line-through;}
+  .tl-kind{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+    border-radius:6px; padding:2px 7px; margin-right:6px;}
+  .k-learn{background:var(--accent-soft); color:var(--accent);}
+  .k-review{background:var(--warn-soft); color:var(--warn);}
+  .k-final{background:var(--good-soft); color:var(--good);}
+  .examgrid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .examgrid .stat{background:var(--bg); border-radius:10px; padding:10px 12px;}
+  .examgrid .stat b{display:block; font-size:17px;}
+  .examgrid .stat span{font-size:12.5px; color:var(--muted);}
+  .foot{font-size:12px; color:var(--muted); text-align:center; margin-top:18px;}
+  .foot button{background:none; border:none; color:var(--muted); text-decoration:underline; font-size:12px; cursor:pointer;}
+  dialog{border:1px solid var(--line); border-radius:14px; padding:20px; max-width:340px; width:90vw;}
+  dialog input{border:1px solid var(--line); border-radius:9px; padding:8px 10px; font-size:15px; width:100%; margin:8px 0 12px;}
+  dialog::backdrop{background:rgba(0,0,0,.35);}
+  @media (max-width:480px){ .examgrid{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>AP Microeconomics</h1>
+    <div class="sub">Exam: <b id="examDateLbl">Tuesday, May 4, 2027 · 12:00 PM</b> · hybrid digital (MCQ on screen, FRQ handwritten)</div>
+    <div class="countdown">
+      <div><div class="big" id="daysLeft">–</div><div class="lbl">days to go</div></div>
+      <div class="lbl" id="weeksLeft"></div>
+    </div>
+    <div class="progress">
+      <div class="bar"><div class="fill" id="progFill"></div></div>
+      <div class="txt" id="progTxt"></div>
+    </div>
+  </header>
+
+  <div class="card" id="upNextCard">
+    <h2>Up next</h2>
+    <div id="upNext" class="muted">Loading…</div>
+  </div>
+
+  <div class="card">
+    <h2>The 6 units <span class="muted" style="font-weight:400">· in exam order</span></h2>
+    <div id="units"></div>
+  </div>
+
+  <div class="card">
+    <h2>Study timeline <span class="muted" style="font-weight:400">· auto-built from today</span></h2>
+    <div class="muted" style="margin-bottom:8px">Learn each unit in exam-weight order, then a full review pass with FRQ practice, then timed practice exams in the final stretch. Tick blocks off as you finish them.</div>
+    <div id="timeline"></div>
+  </div>
+
+  <div class="card">
+    <h2>Exam day</h2>
+    <div class="examgrid">
+      <div class="stat"><b>60 questions</b><span>Multiple choice · 70 min · ~67% of score</span></div>
+      <div class="stat"><b>3 questions</b><span>Free response · 60 min incl. 10-min reading · ~33%</span></div>
+      <div class="stat"><b>1 long FRQ</b><span>10 points · usually graphing + explanation</span></div>
+      <div class="stat"><b>2 short FRQs</b><span>5 points each</span></div>
+    </div>
+    <p class="muted" style="margin:10px 0 0">Hybrid digital: read MCQ and FRQ prompts in Bluebook, handwrite FRQ answers in the paper booklet. Practice shifting between screen and paper graphs before exam day.</p>
+  </div>
+
+  <div class="foot">
+    Data saves on this device only. <button id="resetBtn">Reset all progress</button> ·
+    <button id="dateBtn">Change exam date</button>
+  </div>
+</div>
+
+<dialog id="dateDlg">
+  <h3 style="margin-top:0">Exam date</h3>
+  <div class="muted">If College Board moves the date, update it here and the timeline rebuilds.</div>
+  <input type="date" id="dateInput" value="2027-05-04">
+  <div class="row"><button class="btn" id="dateSave">Save</button>
+  <button class="btn ghost" id="dateCancel">Cancel</button></div>
+</dialog>
+
+<script>
+"use strict";
+/* ============ Data ============ */
+const QUIZ = "https://alexzwu.github.io/erica-quiz-generator";
+const UNITS = [
+  {id:"apmicro-basics",        n:1, name:"Basic Economic Concepts",                 w:[12,15]},
+  {id:"apmicro-supply-demand", n:2, name:"Supply and Demand",                       w:[20,25]},
+  {id:"apmicro-cost-perfect",  n:3, name:"Production, Cost & Perfect Competition",  w:[22,25]},
+  {id:"apmicro-imperfect",     n:4, name:"Imperfect Competition",                   w:[15,22]},
+  {id:"apmicro-factors",       n:5, name:"Factor Markets",                          w:[10,13]},
+  {id:"apmicro-market-failure",n:6, name:"Market Failure & the Role of Government", w:[8,13]},
+];
+const LS_KEY = "apmicro-planner-v1";
+
+/* ============ State ============ */
+function blankState(){ return {examDate:"2027-05-04", units:{}, blocks:{}}; }
+let S;
+try { S = JSON.parse(localStorage.getItem(LS_KEY)) || blankState(); }
+catch(e){ S = blankState(); }
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(S)); }
+function uState(id){
+  if(!S.units[id]) S.units[id] = {phase:"todo", notes:false, quiz:false, scores:[], reviews:[]};
+  return S.units[id];
+}
+
+/* ============ Dates ============ */
+const DAY = 86400000;
+function todayMid(){ const d=new Date(); d.setHours(0,0,0,0); return d; }
+function examDate(){ const d=new Date(S.examDate+"T12:00:00"); return d; }
+function daysLeft(){ return Math.max(0, Math.round((examDate()-todayMid())/DAY)); }
+function fmt(d){ return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+function fmtFull(d){ return d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"}); }
+
+/* ============ Timeline builder ============ */
+function buildTimeline(){
+  const D = daysLeft();
+  const weights = UNITS.map(u=>(u.w[0]+u.w[1])/2);
+  const wSum = weights.reduce((a,b)=>a+b,0);
+  // raw day allocations
+  let learn = weights.map(w=>Math.max(3, Math.round(D*0.55*w/wSum)));
+  let review = UNITS.map(()=>Math.max(2, Math.round(D*0.25/6)));
+  // scale to fit D exactly (leave final as remainder)
+  const used = learn.reduce((a,b)=>a+b,0)+review.reduce((a,b)=>a+b,0);
+  const scale = used>0 ? (D*0.8)/used : 1;
+  learn = learn.map(x=>Math.max(2,Math.round(x*scale)));
+  review = review.map(x=>Math.max(1,Math.round(x*scale)));
+  const learnTotal = learn.reduce((a,b)=>a+b,0);
+  const reviewTotal = review.reduce((a,b)=>a+b,0);
+  const finalDays = Math.max(1, D - learnTotal - reviewTotal);
+
+  const blocks=[]; let cur = todayMid();
+  const push=(kind,label,unitId,days,note)=>{
+    const start=new Date(cur), end=new Date(cur.getTime()+(days-1)*DAY);
+    blocks.push({id:kind+"-"+(unitId||"final"), kind, label, unitId, start:+start, end:+end, days, note});
+    cur = new Date(cur.getTime()+days*DAY);
+  };
+  UNITS.forEach((u,i)=>push("learn",`Unit ${u.n} — learn: ${u.name}`,u.id,learn[i],
+    "Read the review notes, then generate quizzes until scores are solid."));
+  UNITS.forEach((u,i)=>push("review",`Unit ${u.n} — review + FRQ: ${u.name}`,u.id,review[i],
+    "Re-quiz missed concepts. Do 1–2 free-response prompts by hand, timed."));
+  push("final","Final stretch — timed practice exams",null,finalDays,
+    "Full 60-question MCQ sets in 70 min + 3 FRQs in 60 min. Drill only your weakest units.");
+  return blocks;
+}
+
+/* ============ Review scheduling ============ */
+function scheduleReviews(uid){
+  const st = uState(uid);
+  const done = new Set(st.reviews.filter(r=>r.done).map(r=>r.date));
+  const t = todayMid().getTime();
+  const plan = [3,10,30];
+  st.reviews = plan.map(off=>{
+    const date = new Date(t+off*DAY).toISOString().slice(0,10);
+    return {date, done: done.has(date)};
+  });
+  save();
+}
+
+/* ============ Render ============ */
+const $ = id=>document.getElementById(id);
+
+function render(){
+  const dl = daysLeft();
+  $("daysLeft").textContent = dl;
+  $("weeksLeft").textContent = `≈ ${(dl/7).toFixed(1)} weeks`;
+  $("examDateLbl").textContent = examDate().toLocaleDateString("en-US",
+    {weekday:"long",month:"long",day:"numeric",year:"numeric"}) + " · 12:00 PM";
+
+  // progress: units done + blocks done
+  const doneUnits = UNITS.filter(u=>uState(u.id).phase==="done").length;
+  const blocks = buildTimeline();
+  const doneBlocks = blocks.filter(b=>S.blocks[b.id]).length;
+  const pct = Math.round((doneUnits/UNITS.length*0.6 + doneBlocks/blocks.length*0.4)*100);
+  $("progFill").style.width = pct+"%";
+  $("progTxt").textContent = `${doneUnits} of 6 units complete · ${doneBlocks} of ${blocks.length} study blocks done · ${pct}%`;
+
+  renderUpNext(blocks);
+  renderUnits(blocks);
+  renderTimeline(blocks);
+}
+
+function renderUpNext(blocks){
+  const t = todayMid().getTime();
+  const active = blocks.find(b=>t>=b.start && t<=b.end && !S.blocks[b.id]) || blocks.find(b=>!S.blocks[b.id]);
+  // due reviews
+  const due=[];
+  UNITS.forEach(u=>{
+    const st=uState(u.id);
+    st.reviews.forEach(r=>{
+      if(!r.done && new Date(r.date+"T12:00:00").getTime()<=t) due.push({u,r});
+    });
+  });
+  let html="";
+  if(active) html += `<div class="check" style="padding:4px 0"><span>📅 <b>${active.label}</b><br><span class="muted">${fmtFull(new Date(active.start))} → ${fmtFull(new Date(active.end))} · ${active.note||""}</span></span></div>`;
+  if(due.length) html += due.map(d=>`<div style="padding:4px 0">🔁 <b>Review due:</b> Unit ${d.u.n} — ${d.u.name} <span class="due">due ${d.r.date}</span></div>`).join("");
+  else if(!active) html += "All blocks complete. Light review until exam day — you've got this.";
+  if(!active && !due.length) html = "All blocks complete. Light review until exam day — you've got this.";
+  $("upNext").innerHTML = html;
+}
+
+function renderUnits(blocks){
+  const t = todayMid().getTime();
+  $("units").innerHTML = UNITS.map(u=>{
+    const st = uState(u.id);
+    const dueReview = st.reviews.some(r=>!r.done && new Date(r.date+"T12:00:00").getTime()<=t);
+    const best = st.scores.length? Math.max(...st.scores.map(s=>s.score)) : null;
+    const revHtml = st.reviews.length? st.reviews.map((r,i)=>{
+      const overdue = !r.done && new Date(r.date+"T12:00:00").getTime()<t;
+      return `<label class="rev-item ${overdue?'overdue':''}"><input type="checkbox" data-rev="${u.id}:${i}" ${r.done?"checked":""}><span class="d">${r.date}</span><span class="muted">${overdue?"overdue":"spaced review"}</span></label>`;
+    }).join("") : `<div class="muted" style="font-size:13px">Mark the unit complete to auto-schedule spaced reviews.</div>`;
+    const logHtml = st.scores.length? `<div class="quizlog">Quiz scores: ${st.scores.map(s=>`<b>${s.score}%</b> <span>(${s.date})</span>`).join(" · ")}</div>`:"";
+    return `<div class="card unit st-${st.phase}" style="margin-bottom:10px">
+      <div class="unit-top">
+        <div>
+          <div class="unit-num">Unit ${u.n}</div>
+          <div class="unit-name">${u.name}${dueReview?'<span class="due">review due</span>':''}</div>
+          <span class="weight">${u.w[0]}–${u.w[1]}% of exam</span>
+        </div>
+        <select class="status" data-phase="${u.id}">
+          ${["todo","studying","review","done"].map(p=>`<option value="${p}" ${st.phase===p?"selected":""}>${{todo:"Not started",studying:"Studying",review:"Reviewing",done:"Complete"}[p]}</option>`).join("")}
+        </select>
+      </div>
+      <div class="row" style="margin:10px 0">
+        <a class="btn small" href="${QUIZ}/#/unit/${u.id}">Generate quiz</a>
+        <a class="btn small ghost" href="${QUIZ}/#/notes/${u.id}">Review notes</a>
+      </div>
+      <label class="check ${st.notes?'done':''}"><input type="checkbox" data-notes="${u.id}" ${st.notes?"checked":""}><span>Review notes read</span></label>
+      <label class="check ${st.quiz?'done':''}"><input type="checkbox" data-quiz="${u.id}" ${st.quiz?"checked":""}><span>Practice quiz taken${best!==null?` (best: ${best}%)`:""}</span></label>
+      ${logHtml}
+      <div class="scoreform">
+        <input type="number" min="0" max="100" placeholder="Quiz score %" id="score-${u.id}">
+        <button class="btn small ghost" data-addscore="${u.id}">Log score</button>
+      </div>
+      <div style="margin-top:8px"><div class="muted" style="font-size:12.5px; font-weight:700; margin-bottom:2px">SPACED REVIEWS</div>${revHtml}</div>
+    </div>`;
+  }).join("");
+}
+
+function renderTimeline(blocks){
+  const t = todayMid().getTime();
+  const byMonth = {};
+  blocks.forEach(b=>{
+    const m = new Date(b.start).toLocaleDateString("en-US",{month:"long",year:"numeric"});
+    (byMonth[m]=byMonth[m]||[]).push(b);
+  });
+  $("timeline").innerHTML = Object.entries(byMonth).map(([m,bs])=>
+    `<div class="muted" style="font-weight:700; font-size:13px; margin:12px 0 2px">${m}</div>` +
+    bs.map(b=>{
+      const done = !!S.blocks[b.id];
+      const live = t>=b.start && t<=b.end && !done;
+      return `<div class="tl-block">
+        <input type="checkbox" data-block="${b.id}" ${done?"checked":""}>
+        <div><span class="tl-kind k-${b.kind}">${b.kind==="learn"?"Learn":b.kind==="review"?"Review":"Final"}</span><span class="tl-label ${done?'done':''}"><b>${b.label}</b>${live?' <span class="due">now</span>':''}</span>
+        <div class="tl-dates">${fmtFull(new Date(b.start))} → ${fmtFull(new Date(b.end))} · ${b.days}d</div>
+        <div class="muted" style="font-size:12.5px">${b.note||""}</div></div>
+      </div>`;
+    }).join("")
+  ).join("");
+}
+
+/* ============ Events ============ */
+document.addEventListener("change", e=>{
+  const el = e.target;
+  if(el.dataset.phase){
+    const st = uState(el.dataset.phase);
+    const was = st.phase;
+    st.phase = el.value;
+    if(el.value==="done" && was!=="done") scheduleReviews(el.dataset.phase);
+    save(); render();
+  }
+  if(el.dataset.notes!==undefined){ uState(el.dataset.notes).notes = el.checked; save(); render(); }
+  if(el.dataset.quiz!==undefined){ uState(el.dataset.quiz).quiz = el.checked; save(); render(); }
+  if(el.dataset.rev){
+    const [uid, i] = el.dataset.rev.split(":");
+    uState(uid).reviews[+i].done = el.checked; save(); render();
+  }
+  if(el.dataset.block){ S.blocks[el.dataset.block] = el.checked; save(); render(); }
+});
+document.addEventListener("click", e=>{
+  const el = e.target;
+  if(el.dataset.addscore){
+    const uid = el.dataset.addscore;
+    const inp = $("score-"+uid);
+    const v = parseInt(inp.value,10);
+    if(isNaN(v)||v<0||v>100){ inp.focus(); return; }
+    uState(uid).scores.push({date:new Date().toISOString().slice(0,10), score:v});
+    uState(uid).quiz = true;
+    save(); render();
+  }
+  if(el.id==="resetBtn" && confirm("Reset all planner progress?")){
+    S = blankState(); save(); render();
+  }
+  if(el.id==="dateBtn"){ $("dateInput").value = S.examDate; $("dateDlg").showModal(); }
+  if(el.id==="dateCancel") $("dateDlg").close();
+  if(el.id==="dateSave"){ S.examDate = $("dateInput").value || S.examDate; save(); $("dateDlg").close(); render(); }
+});
+
+render();
+</script>
+</body>
+</html>
